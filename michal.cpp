@@ -16,7 +16,7 @@ class Hero
     int level = 1;
     int level_up_experience = 100;
   
-    string class_choose(string class_input)
+    void class_choose(string class_input)
     {
        if (class_input == "Warrior")
        {
