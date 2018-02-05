@@ -159,68 +159,48 @@ string whatClass()
 
 int main()
 {
-    string name, gender, character_class, where, direction1, direction2;
-    int menu_choice;
-    const string directions[3] = {"left", "right", "straight"};
-  
-    cout << "1: Start the game" << endl;
-    cout << "2: Load the game" << endl;
-    cout << "3: Authors" << endl;
-    cout << "4: Exit" << endl;
-  
-    cin >> menu_choice;
-    switch(menu_choice)
+    string name, gender, character_class;
+    int user_choice;
+    
+    cout << "Press a number to choose" << endl;
+    cout << "1. Play the game" << endl;
+    cout << "2. Load the game" << endl;
+    cout << "3. Authors" << endl;
+    cout << "4. Exit" << endl;
+    cin >> user_choice;
+    switch(user_choice)
     {
-        case 1:
+      case 1 :
+        {
             cout << "What is the name of your hero? " << endl;
             cin >> name; 
             character_class = whatClass();
             gender = whatGender();
-  
             Hero hero;
             hero.name = name;
             hero.gender = gender;
             hero.class_choose(character_class);
+            hero.print_stats();
+            hero.add_experience(500);
+            hero.print_stats();
             break;
-        
-        case 2:
-            break;
-        
-        case 3:
-            cout << "sadsa" << endl;
-            cout << "sadsa" << endl;
-            cout << "sadsa" << endl;
-            cout << "sadsa" << endl;
-            cout << "sadsa" << endl;
-            cout << "sadsa" << endl;
-            break;
-        
-        case 4:
-    }
-      
-  
-    cout << "What is the name of your hero? " << endl;
-    cin >> name; 
-    character_class = whatClass();
-    gender = whatGender();
-  
-    Hero hero;
-    hero.name = name;
-    hero.gender = gender;
-    hero.class_choose(character_class);
-
-    cout << "Where do you want to go? " << endl;
-    cin >> where;
-    if (where == "left" || where == "right")
-    {
-        direction1 = directions[rand() % 3];
-        direction2 = directions[rand() % 3];
-        while(direction1 == direction2)
-        {
-            direction2 = directions[rand() % 3];
         }
-        cout << "You can go either " << direction1 << " or " << direction2 << endl;
+        
+      case 2 :
+        cout << "not finished" << endl;
+        break;
+        
+      case 3 :
+        cout << "not finished" << endl;
+        cout << "not finished" << endl;
+        cout << "not finished" << endl;
+        cout << "not finished" << endl;
+        cout << "not finished" << endl;
+        cout << "not finished" << endl;
+        break;
+        
+      case 4 :
+        return 0;
     }
   
-    return 0;
 }
