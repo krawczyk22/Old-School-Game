@@ -67,7 +67,7 @@ int checkingDirectionLeft(int x,int y, int randomnumberX, int randomnumberY,int 
         {
         x=x-1;
         }
-        cout << "You have moved right" << endl;
+        cout << "You have moved left" << endl;
     }
     return x;
 }
