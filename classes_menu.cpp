@@ -219,7 +219,7 @@ int main()
             break;
             
             
-        case 3 :
+        case 3 : //fixed this whole section, other than gavaskars last name
             cout << "The Authors of this game are" << endl;
             cout << "Abdullah Islam" << endl;
             cout << "Charlie Evans" << endl;
