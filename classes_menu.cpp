@@ -218,15 +218,16 @@ int main()
             cout << "not finished" << endl;
             break;
             
-        case 3 :
-            cout << "not finished" << endl;
-            cout << "not finished" << endl;
-            cout << "not finished" << endl;
-            cout << "not finished" << endl;
-            cout << "not finished" << endl;
-            cout << "not finished" << endl;
-            break;
             
+        case 3 :
+            cout << "The Authors of this game are" << endl;
+            cout << "Abdullah Islam" << endl;
+            cout << "Charlie Evans" << endl;
+            cout << "Gavaskar ????????" << endl;
+            cout << "Michal Krawczy" << endl;
+            cout << "Suraj Choli" << endl;
+            break;
+        
         case 4 :
             return 0;
     }
