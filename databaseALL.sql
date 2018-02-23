@@ -17,7 +17,7 @@ INSERT INTO Enemy VALUES(5,14,'Slaad',90,60,130);
 INSERT INTO Enemy VALUES(10,15,'Balor',100,100,600);
 CREATE TABLE Save (id_save INTEGER PRIMARY KEY, name TEXT, gender TEXT, class TEXT, hp NUMERIC, hp_max NUMERIC, strenght NUMERIC, armour NUMERIC, magic NUMERIC, experience NUMERIC, level NUMERIC, level_up_exp NUMERIC, xlocation NUMERIC, ylocation NUMERIC);
 INSERT INTO Save VALUES(1,'Michal','Male','Mage',100,100,10,10,10,10,1,100,1,1);
-INSERT INTO Save VALUES(2,'Gavaskar','Female','Archer',100,100,20,40,10,55,1,100,1116465280,32766);
+INSERT INTO Save VALUES(2,'Gavaskar','Female','Archer',100,100,20,40,10,55,1,100,1,1);
 CREATE TABLE Weapons (id_weapon INTEGER PRIMARY KEY, name_weapon TEXT, damage_weapon );
 INSERT INTO Weapons VALUES(1,'Dagger',10);
 INSERT INTO Weapons VALUES(2,'Knife',15);
