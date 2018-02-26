@@ -29,4 +29,9 @@ INSERT INTO Weapons VALUES(7,'Hammer',40);
 INSERT INTO Weapons VALUES(8,'Longsword',45);
 INSERT INTO Weapons VALUES(9,'Rapier',50);
 INSERT INTO Weapons VALUES(10,'Blade',60);
+CREATE TABLE Potions (id_Potions NUMERIC, name TEXT, health NUMERIC, damage NUMERIC, shield NUMERIC)
+INSERT INTO Potions VALUES(1, 'sheild buff', 0, 0, 50 );
+INSERT INTO Potions VALUES(2, 'shield BOUFFF', 0, 0, 100 );
+INSERT INTO Potions VALUES(3, 'health boost', 50, 0, 0);
+INSERT INTO Potions VALUES(4, 'health slurp', 100, 0, 0);
 COMMIT;
