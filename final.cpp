@@ -402,59 +402,59 @@ int main()
                 
                 // Executing instructions - Gavaskar (not finished)
                 while (!(x == 2 && y == 2))
-    {
-    string direction = "";
-    cout << "Which direction would you like to go?: " ;
-    cin >> direction;
-    transform(direction.begin(), direction.end(), direction.begin(), ::tolower);
-    string stringX = to_string(x);
-    string stringY = to_string(y);
-    string xy = stringX + stringY;
-        
-    vector<string> forwardList ={"forwards","forward","north","ahead","onwards"};
-    if (find(forwardList.begin(), forwardList.end(), direction) != forwardList.end())
-    {
-        y = checkingDirectionForwards(x,y, randomnumberX, randomnumberY, yrange); // call a checking function to see if you can move that way, then run the forwards function.
-        if (!(find(visitedList.begin(), visitedList.end(), xy) != visitedList.end()))
-        {
-            visitedList.push_back(xy);
-        }
-        //for(int i=0; i<visitedList.size(); ++i)
-        //cout << visitedList[i] << ' ';
-    }
-    vector<string> backwardsList ={"backwards","backward","south","down","downward","downwards","back"};
-    if (find(backwardsList.begin(), backwardsList.end(), direction) != backwardsList.end())
-    {
-        
-        y = checkingDirectionBackwards(x,y, randomnumberX, randomnumberY, yrange); 
-                if (!(find(visitedList.begin(), visitedList.end(), xy) != visitedList.end()))
-        {
-            visitedList.push_back(xy);
-        }
-    }
-    vector<string> rightList ={"right","east"};
-    if (find(rightList.begin(), rightList.end(), direction) != rightList.end())
-    {
-        x = checkingDirectionRight(x,y, randomnumberX, randomnumberY, xrange); 
-                if (!(find(visitedList.begin(), visitedList.end(), xy) != visitedList.end()))
-        {
-            visitedList.push_back(xy);
-        }
-    }
-    vector<string> leftList ={"left","west"};
-    if (find(leftList.begin(), leftList.end(), direction) != leftList.end())
-    {
-        x = checkingDirectionLeft(x,y, randomnumberX, randomnumberY, xrange); 
-                if (!(find(visitedList.begin(), visitedList.end(), xy) != visitedList.end()))
-        {
-            visitedList.push_back(xy);
-        }
-    }
-    if (direction == "weast")
-    {
-        cout << "Weast? What kind of compass are you reading?" << endl;
-    }
-    }
+                {
+                string direction = "";
+                cout << "Which direction would you like to go?: " ;
+                cin >> direction;
+                transform(direction.begin(), direction.end(), direction.begin(), ::tolower);
+                string stringX = to_string(x);
+                string stringY = to_string(y);
+                string xy = stringX + stringY;
+
+                vector<string> forwardList ={"forwards","forward","north","ahead","onwards"};
+                if (find(forwardList.begin(), forwardList.end(), direction) != forwardList.end())
+                {
+                    y = checkingDirectionForwards(x,y, randomnumberX, randomnumberY, yrange); // call a checking function to see if you can move that way, then run the forwards function.
+                    if (!(find(visitedList.begin(), visitedList.end(), xy) != visitedList.end()))
+                    {
+                        visitedList.push_back(xy);
+                    }
+                    //for(int i=0; i<visitedList.size(); ++i)
+                    //cout << visitedList[i] << ' ';
+                }
+                vector<string> backwardsList ={"backwards","backward","south","down","downward","downwards","back"};
+                if (find(backwardsList.begin(), backwardsList.end(), direction) != backwardsList.end())
+                {
+
+                    y = checkingDirectionBackwards(x,y, randomnumberX, randomnumberY, yrange); 
+                            if (!(find(visitedList.begin(), visitedList.end(), xy) != visitedList.end()))
+                    {
+                        visitedList.push_back(xy);
+                    }
+                }
+                vector<string> rightList ={"right","east"};
+                if (find(rightList.begin(), rightList.end(), direction) != rightList.end())
+                {
+                    x = checkingDirectionRight(x,y, randomnumberX, randomnumberY, xrange); 
+                            if (!(find(visitedList.begin(), visitedList.end(), xy) != visitedList.end()))
+                    {
+                        visitedList.push_back(xy);
+                    }
+                }
+                vector<string> leftList ={"left","west"};
+                if (find(leftList.begin(), leftList.end(), direction) != leftList.end())
+                {
+                    x = checkingDirectionLeft(x,y, randomnumberX, randomnumberY, xrange); 
+                            if (!(find(visitedList.begin(), visitedList.end(), xy) != visitedList.end()))
+                    {
+                        visitedList.push_back(xy);
+                    }
+                }
+                if (direction == "weast")
+                {
+                    cout << "Weast? What kind of compass are you reading?" << endl;
+                }
+                }
                 
                 // Combat (5 is the ID of the monster in the database. 15th ID is the boss) - Suraj (not finished)
                 auto result_combat = combat(2, hero.strenght, hero.magic_points, hero.armour, hero.health_points);
@@ -515,11 +515,11 @@ int main()
             
             case 3 :
                 cout << "The game has been made by:" << endl;
-                cout << "Michal Krawczykowski" << endl;
-                cout << "Charlie Evans" << endl;
-                cout << "Abdullah Islam" << endl;
-                cout << "Suraj Choli" << endl;
-                cout << "Gavaskar GL;1I3BRI;ANWIUSDKFJ" << endl;
+                cout << "Michal 'Not Micheal' Krawczykowski" << endl;
+                cout << "Charlie 'Jack' Evans" << endl;
+                cout << "Abdullah 'Christian' Islam" << endl;
+                cout << "Suraj 'Yes' Choli" << endl;
+                cout << "Gavaskar ''Absent MAnager GL;1I3BRI;ANWIUSDKFJ" << endl;
 
             case 4 :
                 return 0;
