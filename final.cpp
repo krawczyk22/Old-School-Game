@@ -405,6 +405,8 @@ int main()
                         string stringX = to_string(x);
                         string stringY = to_string(y);
                         string xy = stringX + stringY;
+                  
+                        
 
                         vector<string> forwardList ={"forwards","forward","north","ahead","onwards"};
                         vector<string> backwardsList ={"backwards","backward","south","down","downward","downwards","back"};
@@ -450,7 +452,7 @@ int main()
                             }
                         }
                     
-                        if (direction == "weast")
+                        else if (direction == "weast")
                         {
                             cout << "Weast? What kind of compass are you reading?" << endl;
                         }
@@ -464,14 +466,18 @@ int main()
                         {
                             return 0;
                         }
+                  
+                        else 
+                        {
+                            cout << "Wrong value" << endl;
+                        }
+                  
+                        auto result_combat = combat(2, hero.strenght, hero.magic_points, hero.armour, hero.health_points);
+                        hero.update_hp(result_combat.first);
+                        hero.add_experience(result_combat.second);
                 }
                 
                 cout << "Congratulations! You finished the game" << endl;
-                
-                // Combat (5 is the ID of the monster in the database. 15th ID is the boss) - Suraj (not finished)
-                auto result_combat = combat(2, hero.strenght, hero.magic_points, hero.armour, hero.health_points);
-                hero.update_hp(result_combat.first);
-                hero.add_experience(result_combat.second);
                 break;
             }
             
