@@ -342,7 +342,6 @@ int checkingDirectionLeft(int x,int y, int randomnumberX, int randomnumberY,int 
         x=x-1;      
         }
         cout << "You have moved left" << endl;
-      //run spawn code from here
     }
     return x;
 }
@@ -352,19 +351,14 @@ int main()
     string name, gender, character_class, menu_choice;
     int user_choice, level, strenght, magic_points, armour, hp, hp_max, exp, exp_max, xlocation, ylocation;
     int menu_check = 0;
-  int x = 0;
-    int y = 0;
-    
+    int x = 0;
+    int y = 0;   
     int xrange = 10;
-    int yrange = 10;
-    
+    int yrange = 10;    
     vector <string> visitedList{};
     srand (time(NULL));
     int randomnumberX = rand() % 10; 
     int ID = rand() % 9999;
-    
-    
-
     int randomnumberY = rand() % 10; 
     string sqliteFile = "databaseALL.sqlite3";
         //Main menu - Suraj
@@ -404,82 +398,75 @@ int main()
                 // Executing instructions - Gavaskar (not finished)
                 while (!(x == 2 && y == 2))
                 {
-                string direction = "";
-                cout << "Which direction would you like to go?: " ;
-                cin >> direction;
-                transform(direction.begin(), direction.end(), direction.begin(), ::tolower);
-                string stringX = to_string(x);
-                string stringY = to_string(y);
-                string xy = stringX + stringY;
+                        string direction = "";
+                        cout << "Which direction would you like to go?: " ;
+                        cin >> direction;
+                        transform(direction.begin(), direction.end(), direction.begin(), ::tolower);
+                        string stringX = to_string(x);
+                        string stringY = to_string(y);
+                        string xy = stringX + stringY;
 
-                vector<string> forwardList ={"forwards","forward","north","ahead","onwards"};
-                if (find(forwardList.begin(), forwardList.end(), direction) != forwardList.end())
-                {
-                    y = checkingDirectionForwards(x,y, randomnumberX, randomnumberY, yrange); // call a checking function to see if you can move that way, then run the forwards function.
-                    if (!(find(visitedList.begin(), visitedList.end(), xy) != visitedList.end()))
-                    {
-                        visitedList.push_back(xy);
-                    }
-                    //for(int i=0; i<visitedList.size(); ++i)
-                    //cout << visitedList[i] << ' ';
-                }
-                vector<string> backwardsList ={"backwards","backward","south","down","downward","downwards","back"};
-                if (find(backwardsList.begin(), backwardsList.end(), direction) != backwardsList.end())
-                {
-
-                    y = checkingDirectionBackwards(x,y, randomnumberX, randomnumberY, yrange); 
-                 if (!(find(visitedList.begin(), visitedList.end(), xy) != visitedList.end()))
-                   {
-                       visitedList.push_back(xy);
-                   }
-                  else
-                  {
-                    int spawnCheck = rand() % 100;
-                    int typeSpawn =  rand() % 100; 
+                        vector<string> forwardList ={"forwards","forward","north","ahead","onwards"};
+                        vector<string> backwardsList ={"backwards","backward","south","down","downward","downwards","back"};
+                        vector<string> rightList ={"right","east"};
+                        vector<string> leftList ={"left","west"};
+                  
+                        if (find(forwardList.begin(), forwardList.end(), direction) != forwardList.end())
+                        {
+                            y = checkingDirectionForwards(x,y, randomnumberX, randomnumberY, yrange); // call a checking function to see if you can move that way, then run the forwards function.
+                            if (!(find(visitedList.begin(), visitedList.end(), xy) != visitedList.end()))
+                            {
+                                visitedList.push_back(xy);
+                            }
+                            for(int i=0; i<visitedList.size(); ++i)
+                            cout << visitedList[i] << ' ';
+                        }
                     
-                    if (spawnCheck < 80)
-                    {
-                      if (typeSpawn >= 95)
-                      {
-                        cout << "npc" << endl;
-                      }
-                      if (typeSpawn < 70)
-                      {
-                        int monRand = rand() % 10;
-                        auto result_combat = combat(monRand, hero.strenght, hero.magic_points, hero.armour, hero.health_points);
-                        hero.update_hp(result_combat.first);
-                        hero.add_experience(result_combat.second);
-                      }
-                      if (typeSpawn >= 80 && typeSpawn < 95)
-                      {
-                        cout << "item" << endl;
-                      }
-                    }
-                  }
+                        else if (find(backwardsList.begin(), backwardsList.end(), direction) != backwardsList.end())
+                        {
+
+                            y = checkingDirectionBackwards(x,y, randomnumberX, randomnumberY, yrange); 
+                                    if (!(find(visitedList.begin(), visitedList.end(), xy) != visitedList.end()))
+                            {
+                                visitedList.push_back(xy);
+                            }
+                        }
+                    
+                        else if (find(rightList.begin(), rightList.end(), direction) != rightList.end())
+                        {
+                            x = checkingDirectionRight(x,y, randomnumberX, randomnumberY, xrange); 
+                                    if (!(find(visitedList.begin(), visitedList.end(), xy) != visitedList.end()))
+                            {
+                                visitedList.push_back(xy);
+                            }
+                        }
+                       
+                        else if (find(leftList.begin(), leftList.end(), direction) != leftList.end())
+                        {
+                            x = checkingDirectionLeft(x,y, randomnumberX, randomnumberY, xrange); 
+                                    if (!(find(visitedList.begin(), visitedList.end(), xy) != visitedList.end()))
+                            {
+                                visitedList.push_back(xy);
+                            }
+                        }
+                    
+                        if (direction == "weast")
+                        {
+                            cout << "Weast? What kind of compass are you reading?" << endl;
+                        }
+                    
+                        else if (direction == "save")
+                        {
+                            save_the_game(name, gender, character_class, hero.level, hero.health_points, hero.health_points_max, hero.strenght, hero.armour, hero.magic_points, hero.experience, hero.level_up_experience, xlocation, ylocation);
+                        }
+                        
+                        else if (direction == "quit")
+                        {
+                            return 0;
+                        }
                 }
-                vector<string> rightList ={"right","east"};
-                if (find(rightList.begin(), rightList.end(), direction) != rightList.end())
-                {
-                    x = checkingDirectionRight(x,y, randomnumberX, randomnumberY, xrange); 
-                            if (!(find(visitedList.begin(), visitedList.end(), xy) != visitedList.end()))
-                    {
-                        visitedList.push_back(xy);
-                    }
-                }
-                vector<string> leftList ={"left","west"};
-                if (find(leftList.begin(), leftList.end(), direction) != leftList.end())
-                {
-                    x = checkingDirectionLeft(x,y, randomnumberX, randomnumberY, xrange); 
-                            if (!(find(visitedList.begin(), visitedList.end(), xy) != visitedList.end()))
-                    {
-                        visitedList.push_back(xy);
-                    }
-                }
-                if (direction == "weast")
-                {
-                    cout << "Weast? What kind of compass are you reading?" << endl;
-                }
-                }
+                
+                cout << "Congratulations! You finished the game" << endl;
                 
                 // Combat (5 is the ID of the monster in the database. 15th ID is the boss) - Suraj (not finished)
                 auto result_combat = combat(2, hero.strenght, hero.magic_points, hero.armour, hero.health_points);
@@ -544,7 +531,7 @@ int main()
                 cout << "Charlie 'Jack' Evans" << endl;
                 cout << "Abdullah 'Christian' Islam" << endl;
                 cout << "Suraj 'Yes' Choli" << endl;
-                cout << "Gavaskar ''Absent MAnager GL;1I3BRI;ANWIUSDKFJ" << endl;
+                cout << "Gavaskar 'Absent Manager' GL;1I3BRI;ANWIUSDKFJ" << endl;
 
             case 4 :
                 return 0;
