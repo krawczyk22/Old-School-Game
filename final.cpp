@@ -472,7 +472,9 @@ int main()
                             cout << "Wrong value" << endl;
                         }
                   
-                        auto result_combat = combat(2, hero.strenght, hero.magic_points, hero.armour, hero.health_points);
+                  int monRand = rand() % 10;
+                  
+                        auto result_combat = combat(monRand, hero.strenght, hero.magic_points, hero.armour, hero.health_points);
                         hero.update_hp(result_combat.first);
                         hero.add_experience(result_combat.second);
                 }

@@ -5,7 +5,7 @@
 #include <stdexcept>
 using namespace std;
 
-//g++ --std=c++14 test.cpp -o test
+//g++ --std=c++14 test.cpp -o test -lsqlite3
 int checkingDirectionForwards(int x,int y, int randomnumberX, int randomnumberY,int yrange)
 {
     if (y == yrange || (x == randomnumberX && y == randomnumberY))
