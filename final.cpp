@@ -342,6 +342,7 @@ int checkingDirectionLeft(int x,int y, int randomnumberX, int randomnumberY,int 
         x=x-1;      
         }
         cout << "You have moved left" << endl;
+      //run spawn code from here
     }
     return x;
 }
@@ -427,10 +428,34 @@ int main()
                 {
 
                     y = checkingDirectionBackwards(x,y, randomnumberX, randomnumberY, yrange); 
-                            if (!(find(visitedList.begin(), visitedList.end(), xy) != visitedList.end()))
+                 if (!(find(visitedList.begin(), visitedList.end(), xy) != visitedList.end()))
+                   {
+                       visitedList.push_back(xy);
+                   }
+                  else
+                  {
+                    int spawnCheck = rand() % 100;
+                    int typeSpawn =  rand() % 100; 
+                    
+                    if (spawnCheck < 80)
                     {
-                        visitedList.push_back(xy);
+                      if (typeSpawn >= 95)
+                      {
+                        cout << "npc" << endl;
+                      }
+                      if (typeSpawn < 70)
+                      {
+                        int monRand = rand() % 10;
+                        auto result_combat = combat(monRand, hero.strenght, hero.magic_points, hero.armour, hero.health_points);
+                        hero.update_hp(result_combat.first);
+                        hero.add_experience(result_combat.second);
+                      }
+                      if (typeSpawn >= 80 && typeSpawn < 95)
+                      {
+                        cout << "item" << endl;
+                      }
                     }
+                  }
                 }
                 vector<string> rightList ={"right","east"};
                 if (find(rightList.begin(), rightList.end(), direction) != rightList.end())
