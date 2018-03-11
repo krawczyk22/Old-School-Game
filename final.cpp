@@ -184,8 +184,8 @@ string whatClass()  //function for choosing class of the hero
         }
     }
 }
-//Combat - Suraj
-pair<int, int> combat(int id_monster, int strenght, int magic_points, int armour, int hp)
+//Combat - Suraj + Charlie
+pair<int, int> combat(int id_monster, int strenght, int magic_points, int armour, int hp, int x, int y)
 {
     int damage, shield, exp;
     int tot = armour + hp;
@@ -206,8 +206,34 @@ pair<int, int> combat(int id_monster, int strenght, int magic_points, int armour
         damage = cur->get_int(1) + cur->get_int(5);
         shield = cur->get_int(2);
         exp = cur->get_int(3);
+        string monName = cur->get_text(0);
       
-        while(shield > 0)
+      auto cur4 = db.get_statement();
+        cur4->set_sql("INSERT INTO SaveMonsters " 
+          "(monName, damage, shield, exp, x, y) " 
+          "VALUES (?, ?, ?, ?, ?, ?);" );
+        
+        cur4->prepare();
+        cur4->bind(1, monName);
+        cur4->bind(2, damage);
+        cur4->bind(3, shield);
+        cur4->bind(4, exp);
+        cur4->bind(5, x);
+        cur4->bind(6, y);
+
+      
+        cur4->step();
+      
+      string combatOption = "";
+      cout << "Would you like to Run, Fight or use an Item?" ;
+      cin >> combatOption;
+      transform(combatOption.begin(), combatOption.end(), combatOption.begin(), ::tolower);
+
+      vector<string> fightList ={"fight"};
+      if (find(fightList.begin(), fightList.end(), combatOption) != fightList.end())
+      {
+        // run michal code
+             while(shield > 0)
             {
                 tot = tot - damage;
                 if(strenght > magic_points)
@@ -220,12 +246,18 @@ pair<int, int> combat(int id_monster, int strenght, int magic_points, int armour
                 }
             }
       
-        cout << "You defeated the monster and gained " << exp << " experience" << endl;
-     
-        if(tot <= 0)
+                  if(tot <= 0)
         {
             throw invalid_argument( "YOU DIED :)" );
         }
+      }
+      
+      else
+      {
+        return make_pair(0, 0);
+      }
+      
+      cout << "You defeated the monster and gained " << exp << " experience" << endl;
         return make_pair(hp, exp);
     }
     catch( sqlite::exception e )      // catch all sql issues
@@ -395,7 +427,7 @@ int main()
                 cout << "Type 'quit' to quit the game " << endl;
                 cout << "Type 'save' to save the game " << endl;
                 
-                // Executing instructions - Gavaskar (not finished)
+                // Map + movement - Charlie
                 while (!(x == 2 && y == 2))
                 {
                         string direction = "";
@@ -404,6 +436,8 @@ int main()
                         transform(direction.begin(), direction.end(), direction.begin(), ::tolower);
                         string stringX = to_string(x);
                         string stringY = to_string(y);
+                        int previousX = x;
+                        int previousY = y;
                         string xy = stringX + stringY;
                   
                         
@@ -457,7 +491,7 @@ int main()
                             cout << "Weast? What kind of compass are you reading?" << endl;
                         }
                     
-                        else if (direction == "save")
+                        else if (direction == "save") // Gavaskar - saving
                         {
                             save_the_game(name, gender, character_class, hero.level, hero.health_points, hero.health_points_max, hero.strenght, hero.armour, hero.magic_points, hero.experience, hero.level_up_experience, xlocation, ylocation);
                         }
@@ -472,9 +506,41 @@ int main()
                             cout << "Wrong value" << endl;
                         }
                   
-                  int monRand = rand() % 10;
+                  int monRand;
+                  if (monRand == 0)
+                  {
+                    monRand = 14;
+                  }
+                  if (level == 1)
+                  {
+                    monRand = rand() % 4;
+                  }
+                  if (level == 2)
+                  {
+                    monRand = rand() % 6;
+                  }
+                  if (level == 3)
+                  {
+                    monRand = rand() % 8;
+                  }
+                  if (level > 8)
+                  {
+                    monRand = rand() % 13;
+                  }
+                  if (x == 2 && y == 2) // change to variable for exit
+                  {
+                    monRand = 15;
+                  }
                   
-                        auto result_combat = combat(monRand, hero.strenght, hero.magic_points, hero.armour, hero.health_points);
+                        auto result_combat = combat(monRand, hero.strenght, hero.magic_points, hero.armour, hero.health_points, x, y);
+                    if (result_combat.first == 0 && result_combat.second == 0)
+                    {
+                        visitedList.pop_back();
+                      cout << x << y << endl;
+                      x = previousX;
+                      y = previousY;
+                      cout << x << y << endl;
+                    }
                         hero.update_hp(result_combat.first);
                         hero.add_experience(result_combat.second);
                 }
