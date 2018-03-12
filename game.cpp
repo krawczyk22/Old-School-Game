@@ -180,11 +180,85 @@ string whatClass()
     }
 }
 //Combat - Suraj
-pair<int, int> combat(int id_monster, int strenght, int magic_points, int armour, int hp)
+pair<int, int> combat(int id_monster, int strenght, int magic_points, int armour, int hp, int x, int y, string xy, vector <string> visitedList)
 {
     int damage, shield, exp;
     int tot = armour + hp;
     string sqliteFile = "databaseALL.sqlite3";
+  // if xy is in the visited list then run this code except data is pulled from the save monsters instead
+  // need to make it a related db to enemies
+  if (find(visitedList.begin(), visitedList.end(), xy) != visitedList.end())
+  {
+       try 
+    {
+        sqlite::sqlite db( sqliteFile );
+        auto cur6 = db.get_statement(); 
+        cur6->set_sql("SELECT Enemy.name, Enemy.damage, Enemy.shield, Enemy.experience, Weapons.name_weapon, Weapons.damage_weapon, SaveMonster.x, SaveMonster.y " 
+                      "FROM (Enemy INNER JOIN Weapons "
+                      "ON Enemy.id_weapon = Weapons.id_weapon) INNER JOIN SaveMonster ON Enemy.id_enemy = SaveMonster.id_enemy " 
+                      "WHERE SaveMonster.x=? AND SaveMonster.y=?;" );
+        cur6->prepare();
+        cur6->bind(1, x);
+        cur6->bind(2, y);
+        cur6->step();  
+         
+        cout << "You're encountering a " << cur6->get_text(0) << " who's got a " << cur6->get_text(4) << endl;
+        damage = cur6->get_int(1) + cur6->get_int(5);
+        shield = cur6->get_int(2);
+        exp = cur6->get_int(3);
+        string monName = cur6->get_text(0);
+        
+      string combatOption = "";
+      cout << "Would you like to Run, Fight or use an Item?" ;
+      cin >> combatOption;
+      transform(combatOption.begin(), combatOption.end(), combatOption.begin(), ::tolower);
+
+      vector<string> fightList ={"fight"};
+      if (find(fightList.begin(), fightList.end(), combatOption) != fightList.end())
+      {
+        // run michal code
+             while(shield > 0)
+            {
+                tot = tot - damage;
+                if(strenght > magic_points)
+                {
+                    shield -= strenght;
+                }
+                else
+                {
+                    shield -= magic_points;
+                }
+            }
+      
+                  if(tot <= 0)
+        {
+                    auto cur5 = db.get_statement();
+                    cur5->set_sql("DELETE FROM SaveMonsters;");
+                    cur5->prepare();
+                    cur5->step();
+                    
+            throw invalid_argument( "YOU DIED :)" );
+        }
+      }
+      
+      else
+      {
+        return make_pair(0, 0);
+      }
+      
+      cout << "You defeated the monster and gained " << exp << " experience" << endl;
+        return make_pair(hp, exp); 
+         
+
+  }
+        catch( sqlite::exception e )      // catch all sql issues
+    {
+        cerr << e.what() << endl;
+        return make_pair(0, 0);
+    }
+  }
+    else
+    {
     try 
     {
         sqlite::sqlite db( sqliteFile );
@@ -201,8 +275,30 @@ pair<int, int> combat(int id_monster, int strenght, int magic_points, int armour
         damage = cur->get_int(1) + cur->get_int(5);
         shield = cur->get_int(2);
         exp = cur->get_int(3);
+        string monName = cur->get_text(0);
       
-        while(shield > 0)
+        auto cur4 = db.get_statement();
+        cur4->set_sql("INSERT INTO SaveMonster " 
+          "(id_enemy, x, y) " 
+          "VALUES (?, ?, ?);" );
+        
+        cur4->prepare();
+        cur4->bind(1, id_monster);
+        cur4->bind(2, x);
+        cur4->bind(3, y);
+      
+        cur4->step();
+      
+      string combatOption = "";
+      cout << "Would you like to Run, Fight or use an Item?" ;
+      cin >> combatOption;
+      transform(combatOption.begin(), combatOption.end(), combatOption.begin(), ::tolower);
+
+      vector<string> fightList ={"fight"};
+      if (find(fightList.begin(), fightList.end(), combatOption) != fightList.end())
+      {
+        // run michal code
+             while(shield > 0)
             {
                 tot = tot - damage;
                 if(strenght > magic_points)
@@ -215,20 +311,33 @@ pair<int, int> combat(int id_monster, int strenght, int magic_points, int armour
                 }
             }
       
-        cout << "You defeated the monster and gained " << exp << " experience" << endl;
-     
-        if(tot <= 0)
+                  if(tot <= 0)
         {
+                    auto cur5 = db.get_statement();
+                    cur5->set_sql("DELETE FROM SaveMonsters;");
+                    cur5->prepare();
+                    cur5->step();
+                    
             throw invalid_argument( "YOU DIED :)" );
         }
+      }
+      
+      else
+      {
+        return make_pair(0, 0);
+      }
+      
+      cout << "You defeated the monster and gained " << exp << " experience" << endl;
         return make_pair(hp, exp);
     }
     catch( sqlite::exception e )      // catch all sql issues
     {
-        std::cerr << e.what() << std::endl;
+        cerr << e.what() << endl;
         return make_pair(0, 0);
     }
 }
+  }
+
 //Saving the game - Abdullah
 int save_the_game(string name, string gender, string character_class, int level, int hp, int hp_max, int strenght, int armour, int magic_points, int experience, int experience_lvl, int xlocation, int ylocation)
 {
