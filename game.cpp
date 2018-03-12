@@ -787,7 +787,7 @@ int main()
                 cout << "Charlie 'Jack' Evans" << endl;
                 cout << "Abdullah 'Christian' Islam" << endl;
                 cout << "Suraj 'Yes' Choli" << endl;
-                cout << "Gavaskar 'Absent Manager' GL;1I3BRI;ANWIUSDKFJ" << endl;
+                cout << "Richard 'Absent Manager' GL;1I3BRI;H0RT4NANWIUSDKFJ"  << endl;
 
             case 4 :
                 return 0;
