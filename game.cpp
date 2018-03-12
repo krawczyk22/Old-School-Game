@@ -1,4 +1,9 @@
 #include <iostream>
+#include <vector>
+#include <sstream>
+#include <algorithm>
+#include <stdio.h>
+#include <sqlite3.h>
 #include <string>
 #include <iomanip>
 #include <stdexcept>
@@ -18,7 +23,7 @@
 using namespace std;
 //Class, statistics, experience, health points, gender function, 
 //class function - Michal Krawczykowski
-class Hero
+class Hero  //defining class which stores data about the hero
 {
 public:
     string name;
@@ -33,8 +38,8 @@ public:
     int level = 1;
     int level_up_experience = 100;
     
-    void class_choose(string class_input)
-    {
+    void class_choose(string class_input)  //function updating statistics depending on
+    {                                      //chosen class of the hero
         if (class_input == "Warrior")
         {
             character_class = class_input;
@@ -106,16 +111,16 @@ public:
         }
     }
   
-    void add_hp(int hp)
+    void add_hp(int hp)  //function adding health points
     {
         health_points += hp;
         if(health_points >= health_points_max)
         {
-            health_points_max = health_points;
+             health_points = health_points_max;
         }
     }
     
-    void update_hp(int hp)
+    void update_hp(int hp)  //function updating health points
     {
         health_points = hp;
         if(health_points >= health_points_max)
@@ -125,7 +130,7 @@ public:
     }
 };
 
-string whatGender()
+string whatGender()  //function for choosing gender of the hero
 {
     int check_gender = 0;
     string gender;
@@ -150,7 +155,7 @@ string whatGender()
     }
 }
 
-string whatClass()
+string whatClass()  //function for choosing class of the hero
 {
     int check_class = 0;
     string character_class;
@@ -181,13 +186,12 @@ string whatClass()
 }
 //Combat - Suraj
 pair<int, int> combat(int id_monster, int strenght, int magic_points, int armour, int hp, int x, int y, string xy, vector <string> visitedList)
+
 {
     int damage, shield, exp;
     int tot = armour + hp;
     string sqliteFile = "databaseALL.sqlite3";
-  // if xy is in the visited list then run this code except data is pulled from the save monsters instead
-  // need to make it a related db to enemies
-  if (find(visitedList.begin(), visitedList.end(), xy) != visitedList.end())
+  if (false)
   {
        try 
     {
@@ -232,11 +236,6 @@ pair<int, int> combat(int id_monster, int strenght, int magic_points, int armour
       
                   if(tot <= 0)
         {
-                    auto cur5 = db.get_statement();
-                    cur5->set_sql("DELETE FROM SaveMonsters;");
-                    cur5->prepare();
-                    cur5->step();
-                    
             throw invalid_argument( "YOU DIED :)" );
         }
       }
@@ -289,18 +288,20 @@ pair<int, int> combat(int id_monster, int strenght, int magic_points, int armour
       
         cur4->step();
       
+      while(shield > 0)
+      {
       string combatOption = "";
       cout << "Would you like to Run, Fight or use an Item?" ;
       cin >> combatOption;
       transform(combatOption.begin(), combatOption.end(), combatOption.begin(), ::tolower);
 
+      
       vector<string> fightList ={"fight"};
       if (find(fightList.begin(), fightList.end(), combatOption) != fightList.end())
       {
-        // run michal code
-             while(shield > 0)
-            {
-                tot = tot - damage;
+        cout << "Your health points have dropped from " << tot << endl;
+                tot = tot - damage/2;
+        cout << "to " << tot << endl;
                 if(strenght > magic_points)
                 {
                     shield -= strenght;
@@ -309,26 +310,40 @@ pair<int, int> combat(int id_monster, int strenght, int magic_points, int armour
                 {
                     shield -= magic_points;
                 }
-            }
-      
-                  if(tot <= 0)
-        {
-                    auto cur5 = db.get_statement();
-                    cur5->set_sql("DELETE FROM SaveMonsters;");
-                    cur5->prepare();
-                    cur5->step();
-                    
+        if(tot <= 0)
+        {        
             throw invalid_argument( "YOU DIED :)" );
         }
+        if (shield <= 0)
+        {
+        cout << "You defeated the monster and gained " << exp << " experience" << endl;
+        return make_pair(hp, exp);
+        }
+            
       }
-      
-      else
+      vector<string> itemList ={"item"};
+      if (find(itemList.begin(), itemList.end(), combatOption) != itemList.end())
+      {
+      string itemOption = "";
+      cout << "These are the potions you have available, what would you like to use?" ;
+      cin >> itemOption;
+      transform(itemOption.begin(), itemOption.end(), itemOption.begin(), ::tolower);
+      vector<string> healthPotion ={"health"};
+              if (find(healthPotion.begin(), healthPotion.end(), itemOption) != healthPotion.end())
+              {
+                tot += 70;
+              }
+
+      }
+      vector<string> runList ={"run"};
+      if (find(runList.begin(), runList.end(), combatOption) != runList.end())
       {
         return make_pair(0, 0);
       }
+      }
+
+
       
-      cout << "You defeated the monster and gained " << exp << " experience" << endl;
-        return make_pair(hp, exp);
     }
     catch( sqlite::exception e )      // catch all sql issues
     {
@@ -337,6 +352,30 @@ pair<int, int> combat(int id_monster, int strenght, int magic_points, int armour
     }
 }
   }
+// Potions - Michal
+int potion(int potion_number)
+{
+    try 
+    {
+        string sqliteFile = "databaseALL.sqlite3";
+        sqlite::sqlite db( sqliteFile );
+        auto cur4 = db.get_statement();
+        cur4->set_sql("SELECT name, value "
+                      "FROM Potions "
+                      "WHERE id_potion = ?");
+        cur4->prepare();
+        cur4->bind(1, potion_number);
+        cur4->step();
+      
+        cout << "You've found a " << cur4->get_text(0) << " which adds " << cur4->get_int(1) << " points to your health" << endl;
+        return(cur4->get_int(1));
+    }
+    catch( sqlite::exception e )      // catch all sql issues
+    {
+        std::cerr << e.what() << std::endl;
+        return 0;
+    }
+}
 
 //Saving the game - Abdullah
 int save_the_game(string name, string gender, string character_class, int level, int hp, int hp_max, int strenght, int armour, int magic_points, int experience, int experience_lvl, int xlocation, int ylocation)
@@ -383,12 +422,89 @@ int save_the_game(string name, string gender, string character_class, int level,
         return 0;
     }
 }
+//direction functions - Charlie
+int checkingDirectionForwards(int x,int y, int randomnumberX, int randomnumberY,int yrange)
+{
+    if (y == yrange || (x == randomnumberX && y == randomnumberY))
+    {
+    cout << "You cannot go forwards, try another direction" << endl;
+    }
+    if (y < yrange)
+    {
+        if (x != randomnumberX || y != randomnumberY)
+        {
+        y=y+1;
+        }
+        cout << "You have moved forwards" << endl;
+    }
+    return y;
+}
+int checkingDirectionBackwards(int x,int y, int randomnumberX, int randomnumberY,int yrange)
+{
+    if (y == 0 || (x == randomnumberX && y == randomnumberY))
+    {
+    cout << "You cannot go backwards, try another direction" << endl;
+    }
+    if (y > 0)
+    {
+        if (x != randomnumberX || y != randomnumberY)
+        {
+        y=y-1;
+        }
+        cout << "You have moved backwards" << endl;
+    }
+    return y;
+}
+int checkingDirectionRight(int x,int y, int randomnumberX, int randomnumberY,int xrange)
+{
+    if (x == xrange || (x == randomnumberX && y == randomnumberY))
+    {
+    cout << "You cannot go right, try another direction" << endl;
+    }
+    if (x < xrange)
+    {
+        if (x != randomnumberX || y != randomnumberY)
+        {
+        x=x+1;
+        }
+        cout << "You have moved right"<< endl;
+    }
+    return x;
+}
+
+int checkingDirectionLeft(int x,int y, int randomnumberX, int randomnumberY,int xrange)
+{
+    if (x == 0 || (x == randomnumberX && y == randomnumberY))
+    {
+    cout << "You cannot go left, try another direction" <<  endl;
+    }
+    if (x > 0)
+    {
+        if (x != randomnumberX || y != randomnumberY)
+        {
+        x=x-1;      
+        }
+        cout << "You have moved left" << endl;
+    }
+    return x;
+}
 
 int main()
-{   //Relational database (Enemy, Weapons and Save tables) - Gavaskar 
+{   
     string name, gender, character_class, menu_choice;
-    int user_choice, level, strenght, magic_points, armour, hp, hp_max, exp, exp_max, xlocation, ylocation;
+    int user_choice, level, strenght, magic_points, armour, hp, hp_max, exp, exp_max;
     int menu_check = 0;
+    int x = 0;
+    int y = 0; 
+    srand (time(NULL));
+
+    int xrange = 10;
+    int yrange = 10;    
+    vector <string> visitedList{};
+
+    int randomnumberX = rand() % 10; 
+    int ID = rand() % 9999;
+    int randomnumberY = rand() % 10; 
     string sqliteFile = "databaseALL.sqlite3";
         //Main menu - Suraj
         cout << "Press a number to choose" << endl;
@@ -411,7 +527,7 @@ int main()
                 hero.gender = gender;
                 hero.class_choose(character_class);
                   
-                // Instructions - Gavaskar
+                // Instractions - Michal Krawczykowski
                 cout << " " << endl;
                 cout << "-------------------------------------------------------------- " << endl;
                 cout << "You're ending up in a forest full of monsters. " << endl;
@@ -424,30 +540,199 @@ int main()
                 cout << "Type 'quit' to quit the game " << endl;
                 cout << "Type 'save' to save the game " << endl;
                 
-                // Executing instructions - Gavaskar (not finished)
-                while(menu_check == 0)
+                // Executing instructions and the actual maze - Charlie
+                while (!(x == 2 && y == 2))
                 {
-                    cin >> menu_choice;
-                    if(menu_choice == "save" || menu_choice == "Save")
-                    {
-                        // Saving - Abdullah
-                        save_the_game(name, gender, character_class, hero.level, hero.health_points, hero.health_points_max, hero.strenght, hero.armour, hero.magic_points, hero.experience, hero.level_up_experience, xlocation, ylocation);
-                    }
-                    else if(menu_choice == "quit" || menu_choice == "Quit")
-                    {
-                        menu_check = 1;
-                    }
+                  
+                        string direction = "";
+                        cout << "Which direction would you like to go?: " ;
+                        cin >> direction;
+                        transform(direction.begin(), direction.end(), direction.begin(), ::tolower);
+                        string stringX = to_string(x);
+                        string stringY = to_string(y);
+                        string xy = stringX + stringY;
+                        int previousX = x;
+                        int previousY = y;
+                      int number_monster = rand() % 15;
+                      if (number_monster == 0)
+                      {
+                        number_monster = 1;
+                      }
+
+                        vector<string> forwardList ={"forwards","forward","north","ahead","onwards"};
+                        vector<string> backwardsList ={"backwards","backward","south","down","downward","downwards","back"};
+                        vector<string> rightList ={"right","east"};
+                        vector<string> leftList ={"left","west"};
+                  
+                        if (find(forwardList.begin(), forwardList.end(), direction) != forwardList.end())
+                        {
+                            y = checkingDirectionForwards(x,y, randomnumberX, randomnumberY, yrange); // call a checking function to see if you can move that way, then run the forwards function.
+                            if (!(find(visitedList.begin(), visitedList.end(), xy) != visitedList.end()))
+                            {
+                                visitedList.push_back(xy);
+                                int random_thing = rand() % 100;
+                                int number_potion = rand() % 7;
+                                if (random_thing < 90)
+                                {
+                                    if (random_thing < 60)
+                                    {
+                                        auto result_combat = combat(number_monster, hero.strenght, hero.magic_points, hero.armour, hero.health_points, x, y, xy, visitedList);
+                                        if (result_combat.first == 0 && result_combat.second == 0)
+                                        {
+                                          visitedList.pop_back();
+                                          x = previousX;
+                                          y = previousY;
+                                        }
+                                        hero.update_hp(result_combat.first);
+                                        hero.add_experience(result_combat.second);
+                                    }
+                                    else
+                                    {
+                                        hero.add_hp(potion(number_potion));
+                                    }
+                                }
+                                else
+                                {
+                                    cout << "You didn't find anything" << endl;
+                                }
+                            }
+                        }
+                    
+                        else if (find(backwardsList.begin(), backwardsList.end(), direction) != backwardsList.end())
+                        {
+
+                            y = checkingDirectionBackwards(x,y, randomnumberX, randomnumberY, yrange); 
+                                    if (!(find(visitedList.begin(), visitedList.end(), xy) != visitedList.end()))
+                            {
+                                visitedList.push_back(xy);
+                                int random_thing = rand() % 100;
+                                int number_potion = rand() % 7;
+                                if (random_thing < 90)
+                                {
+                                    if (random_thing < 60)
+                                    {
+                                        auto result_combat = combat(number_monster, hero.strenght, hero.magic_points, hero.armour, hero.health_points, x, y, xy, visitedList);
+                                        if (result_combat.first == 0 && result_combat.second == 0)
+                                        {
+                                          visitedList.pop_back();
+                                          x = previousX;
+                                          y = previousY;
+                                        }
+                                        hero.update_hp(result_combat.first);
+                                        hero.add_experience(result_combat.second);
+                                    }
+                                    else
+                                    {
+                                        hero.add_hp(potion(number_potion));
+                                    }
+                                }
+                                else
+                                {
+                                    cout << "You didn't find anything" << endl;
+                                }
+                            }
+                        }
+                    
+                        else if (find(rightList.begin(), rightList.end(), direction) != rightList.end())
+                        {
+                            x = checkingDirectionRight(x,y, randomnumberX, randomnumberY, xrange); 
+                                    if (!(find(visitedList.begin(), visitedList.end(), xy) != visitedList.end()))
+                            {
+                                visitedList.push_back(xy);
+                                int random_thing = rand() % 100;
+                                int number_potion = rand() % 7;
+                                if (random_thing < 90)
+                                {
+                                    if (random_thing < 60)
+                                    {
+                                        auto result_combat = combat(number_monster, hero.strenght, hero.magic_points, hero.armour, hero.health_points, x, y, xy, visitedList);
+                                        if (result_combat.first == 0 && result_combat.second == 0)
+                                        {
+                                          visitedList.pop_back();
+                                          x = previousX;
+                                          y = previousY;
+                                        }
+                                        hero.update_hp(result_combat.first);
+                                        hero.add_experience(result_combat.second);
+                                    }
+                                    else
+                                    {
+                                        hero.add_hp(potion(number_potion));
+                                      // need michals potion db
+                                    }
+                                }
+                                else
+                                {
+                                    cout << "You didn't find anything" << endl;
+                                }
+                            }
+                        }
+                       
+                        else if (find(leftList.begin(), leftList.end(), direction) != leftList.end())
+                        {
+                            x = checkingDirectionLeft(x,y, randomnumberX, randomnumberY, xrange); 
+                                    if (!(find(visitedList.begin(), visitedList.end(), xy) != visitedList.end()))
+                            {
+                                int random_thing = rand() % 100;
+                                int number_potion = rand() % 7;
+                                if (random_thing < 90)
+                                {
+                                    if (random_thing < 60)
+                                    {
+                                        auto result_combat = combat(number_monster, hero.strenght, hero.magic_points, hero.armour, hero.health_points, x, y, xy, visitedList);
+                                        if (result_combat.first == 0 && result_combat.second == 0)
+                                        {
+                                          visitedList.pop_back();
+                                          x = previousX;
+                                          y = previousY;
+                                        }
+                                      hero.update_hp(result_combat.first);
+                                        hero.add_experience(result_combat.second);
+                                    }
+                                    else
+                                    {
+                                        hero.add_hp(potion(number_potion));
+                                    }
+                                }
+                                else
+                                {
+                                    cout << "You didn't find anything" << endl;
+                                }
+                            }
+                        }
+                    
+                        else if (direction == "weast")
+                        {
+                            cout << "Weast? What kind of compass are you reading?" << endl;
+                        }
+                    
+                        else if (direction == "save")
+                        {
+                            save_the_game(name, gender, character_class, hero.level, hero.health_points, hero.health_points_max, hero.strenght, hero.armour, hero.magic_points, hero.experience, hero.level_up_experience, x, y);
+                        }
+                        
+                        else if (direction == "stats")
+                        {
+                            hero.print_stats();
+                        }
+                        
+                        else if (direction == "quit")
+                        {
+                            return 0;
+                        }
+                  
+                        else 
+                        {
+                            cout << "Wrong value" << endl;
+                        }
                 }
                 
-                // Combat (5 is the ID of the monster in the database. 15th ID is the boss) - Suraj (not finished)
-                auto result_combat = combat(2, hero.strenght, hero.magic_points, hero.armour, hero.health_points);
-                hero.update_hp(result_combat.first);
-                hero.add_experience(result_combat.second);
+                cout << "Congratulations! You finished the game" << endl;
                 break;
             }
             
             case 2 :
-            {   //Loading the game - Abdullah
+            {   //Loading the game - Gavaskar
                 cout << "Press a number to load the game: " << endl;
                 try 
                 {
@@ -483,8 +768,8 @@ int main()
                     hero.experience = cur2->get_int(9);
                     hero.level = cur2->get_int(10);
                     hero.level_up_experience = cur2->get_int(11);
-                    xlocation = cur2->get_int(12);
-                    ylocation = cur2->get_int(13);
+                    x = cur2->get_int(12);
+                    y = cur2->get_int(13);
                     
                     // not finished. will be similar to the case 1
                 }
@@ -498,11 +783,11 @@ int main()
             
             case 3 :
                 cout << "The game has been made by:" << endl;
-                cout << "Michal Krawczykowski" << endl;
-                cout << "Charlie Evans" << endl;
-                cout << "Abdullah Islam" << endl;
-                cout << "Suraj Choli" << endl;
-                cout << "Gavaskar GL;1I3BRI;ANWIUSDKFJ" << endl;
+                cout << "Michal 'Not Micheal' Krawczykowski" << endl;
+                cout << "Charlie 'Jack' Evans" << endl;
+                cout << "Abdullah 'Christian' Islam" << endl;
+                cout << "Suraj 'Yes' Choli" << endl;
+                cout << "Gavaskar 'Absent Manager' GL;1I3BRI;ANWIUSDKFJ" << endl;
 
             case 4 :
                 return 0;
