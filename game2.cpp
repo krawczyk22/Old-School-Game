@@ -155,7 +155,7 @@ string whatGender()  //function for choosing gender of the hero
     }
 }
 
-string whatClass()  //function for choosing class of the hero
+string whatClass()  //function for choosing class of the hero - Gavaskar
 {
     int check_class = 0;
     string character_class;
@@ -770,7 +770,7 @@ int main()
                     hero.level_up_experience = cur2->get_int(11);
                     x = cur2->get_int(12);
                     y = cur2->get_int(13);
-               
+               // Executing instructions after loading the game
                  while (!(x == 2 && y == 2))
                 {
                   
