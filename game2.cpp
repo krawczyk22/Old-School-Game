@@ -383,9 +383,10 @@ int save_the_game(string name, string gender, string character_class, int level,
     string save;
     cout << "Do you want to save the game? " << endl;
     cin >> save;
+    transform(save.begin(), save.end(), save.begin(), ::tolower);  
     try 
     {
-        if(save == "yes" || save == "Yes")
+        if(save == "yes")
         {
         string sqliteFile = "databaseALL.sqlite3";
         sqlite::sqlite db( sqliteFile );
