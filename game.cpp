@@ -625,7 +625,7 @@ int main()
                         
                         if (find(forwardList.begin(), forwardList.end(), direction) != forwardList.end())
                         {
-                            y = checkingDirectionForwards(x, y, yrange); // call a checking function to see if you can move that way, then run the forwards function.
+                            y = checkingDirectionForwards(x, y, yrange); 
                            xy = updateXY(x,y);
                           if (!(find(CompletedList.begin(), CompletedList.end(), xy) != CompletedList.end()))
                           {
@@ -693,7 +693,7 @@ int main()
                     
                        else if (find(backwardsList.begin(), backwardsList.end(), direction) != backwardsList.end())
                         {
-                            y = checkingDirectionBackwards(x, y, yrange); // call a checking function to see if you can move that way, then run the forwards function.
+                            y = checkingDirectionBackwards(x, y, yrange); 
                            xy = updateXY(x,y);
                           if (!(find(CompletedList.begin(), CompletedList.end(), xy) != CompletedList.end()))
                           {
@@ -743,7 +743,7 @@ int main()
                                     }
                                     else
                                     {
-                                        //hero.add_hp(potion(number_potion));
+                                        hero.add_hp(potion(number_potion));
                                       CompletedList.push_back(xy);
 
                                     }
@@ -759,7 +759,7 @@ int main()
                 }
                  else if (find(rightList.begin(), rightList.end(), direction) != rightList.end())
                         {
-                            x = checkingDirectionRight(x, y, yrange); // call a checking function to see if you can move that way, then run the forwards function.
+                            x = checkingDirectionRight(x, y, yrange); 
                            xy = updateXY(x,y);
                         if (!(find(CompletedList.begin(), CompletedList.end(), xy) != CompletedList.end()))
                           {
@@ -825,7 +825,7 @@ int main()
                 }
                  else if (find(leftList.begin(), leftList.end(), direction) != leftList.end())
                         {
-                            x = checkingDirectionLeft(x, y, yrange); // call a checking function to see if you can move that way, then run the forwards function.
+                            x = checkingDirectionLeft(x, y, yrange); 
                            xy = updateXY(x,y);
                           if (!(find(CompletedList.begin(), CompletedList.end(), xy) != CompletedList.end()))
                           {
