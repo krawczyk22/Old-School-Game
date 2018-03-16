@@ -257,7 +257,7 @@ The player can either fight or run, running returns the player to the previous a
           while(shield > 0)
       {
       string combatOption = "";
-      cout << "Would you like to Run, Fight or use an Item?" ;
+      cout << "Would you like to Fight or Run? " ;
       cin >> combatOption;
       transform(combatOption.begin(), combatOption.end(), combatOption.begin(), ::tolower);
 
@@ -486,14 +486,14 @@ int checkingDirectionForwards(int x,int y, int yrange)
 {
     if (y == yrange)
     {
-    cout << "You cannot go forwards, try another direction" << endl;
+    cout << "You cannot go up, try another direction" << endl;
     }
     if (y < yrange)
     {
 
         y=y+1;
 
-        cout << "You have moved forwards" << endl;
+        cout << "You have moved up" << endl;
     }
     return y;
 }
@@ -501,14 +501,14 @@ int checkingDirectionBackwards(int x,int y, int yrange)
 {
     if (y == 0)
     {
-    cout << "You cannot go backwards, try another direction" << endl;
+    cout << "You cannot go down, try another direction" << endl;
     }
     if (y > 0)
     {
 
         y=y-1;
 
-        cout << "You have moved backwards" << endl;
+        cout << "You have moved down" << endl;
     }
     return y;
 }
