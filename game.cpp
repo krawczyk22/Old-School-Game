@@ -184,14 +184,73 @@ string whatClass()  //function for choosing class of the hero
         }
     }
 }
-//Combat - Suraj
-pair<int, int> combat(int id_monster, int strenght, int magic_points, int armour, int hp, int x, int y, string xy, vector <string> visitedList)
 
+// Potions - Michal
+int potionFind(int potion_number)
 {
-    int damage, shield, exp;
+    try 
+    {
+        string sqliteFile = "databaseALL.sqlite3";
+        sqlite::sqlite db( sqliteFile );
+        auto cur4 = db.get_statement();
+        cur4->set_sql("SELECT name, value "
+                      "FROM Potions "
+                      "WHERE id_potion = ?");
+        cur4->prepare();
+        cur4->bind(1, potion_number);
+        cur4->step();
+      
+        cout << "You've found a " << cur4->get_text(0) << " which adds " << cur4->get_int(1) << " points to your health" << endl;
+        return(cur4->get_int(1));
+    }
+    catch( sqlite::exception e )      // catch all sql issues
+    {
+        std::cerr << e.what() << std::endl;
+        return 0;
+    }
+}
+
+int potion(int potion_number)
+{
+    try 
+    {
+        string sqliteFile = "databaseALL.sqlite3";
+        sqlite::sqlite db( sqliteFile );
+        auto cur4 = db.get_statement();
+        cur4->set_sql("SELECT name, value "
+                      "FROM Potions "
+                      "WHERE id_potion = ?");
+        cur4->prepare();
+        cur4->bind(1, potion_number);
+        cur4->step();
+      
+        return(cur4->get_int(1));
+    }
+    catch( sqlite::exception e )      // catch all sql issues
+    {
+        std::cerr << e.what() << std::endl;
+        return 0;
+    }
+}
+
+int monsterReset() //Charlie
+{
+      string sqliteFile = "databaseALL.sqlite3";
+      sqlite::sqlite db( sqliteFile );
+      auto cur5 = db.get_statement();
+      cur5->set_sql("DELETE FROM SaveMonster;");
+      cur5->prepare();
+      cur5->step();
+}
+pair<int, int> combatAgain(int id_monster, int strenght, int magic_points, int armour, int hp, int x, int y, string xy, vector <string> visitedList, vector <string> potionList)
+{
+      int damage, shield, exp;
     int tot = armour + hp;
+  string smallFind = "25";
+  string mediumFind = "50";
+  string largeFind = "100";
+
     string sqliteFile = "databaseALL.sqlite3";
-  if (false)
   {
        try 
     {
@@ -212,18 +271,26 @@ pair<int, int> combat(int id_monster, int strenght, int magic_points, int armour
         exp = cur6->get_int(3);
         string monName = cur6->get_text(0);
         
+          while(shield > 0)
+      {
       string combatOption = "";
       cout << "Would you like to Run, Fight or use an Item?" ;
       cin >> combatOption;
       transform(combatOption.begin(), combatOption.end(), combatOption.begin(), ::tolower);
 
+      
       vector<string> fightList ={"fight"};
       if (find(fightList.begin(), fightList.end(), combatOption) != fightList.end())
       {
-        // run michal code
-             while(shield > 0)
-            {
+        cout << "Your health points have dropped from " << tot;
                 tot = tot - damage;
+        if (tot < 1)
+        {
+          tot = 0;
+        }
+        cout << " to " << tot << endl;
+        
+        cout << "The " << monName << "'s health points have dropped from " << shield;
                 if(strenght > magic_points)
                 {
                     shield -= strenght;
@@ -232,32 +299,119 @@ pair<int, int> combat(int id_monster, int strenght, int magic_points, int armour
                 {
                     shield -= magic_points;
                 }
-            }
-      
-                  if(tot <= 0)
+        if (shield < 1)
         {
+          shield = 0;
+        }
+        cout << " to " << shield << endl;
+        if(tot <= 0)
+        {        
             throw invalid_argument( "YOU DIED :)" );
         }
+        if (shield <= 0)
+        {
+          int healing = rand() % 25;
+          cout << "You defeated the monster and gained " << exp << " experience points as well as " << healing << " health points!" << endl;
+          hp = tot;
+          hp = hp + healing;
+          return make_pair(hp, exp);
+        }
+            
       }
-      
-      else
+      vector<string> itemList ={"item"};
+
+      if (find(itemList.begin(), itemList.end(), combatOption) != itemList.end())
       {
+                if (potionList.size() != 0)
+        {
+      cout << "These are the potions you have available: " << endl;
+      if (find(potionList.begin(), potionList.end(), smallFind) != potionList.end())
+      {
+        cout << "Small Health Potion" << endl;
+        
+      }
+              if (find(potionList.begin(), potionList.end(), mediumFind) != potionList.end())
+      {
+        cout << "Medium Health Potion" << endl;
+      }
+              if (find(potionList.begin(), potionList.end(), largeFind) != potionList.end())
+      {
+        cout << "Large Health Potion" << endl;
+      }
+
+      string itemOption = "";
+      cout << "What potion would you like to use? " ;
+      cin >> itemOption;
+      transform(itemOption.begin(), itemOption.end(), itemOption.begin(), ::tolower);
+      
+      vector<string> smallPotion ={"small", "small potion", "small health potion", "small health"};
+              if (find(smallPotion.begin(), smallPotion.end(), itemOption) != smallPotion.end())
+              {
+                if (find(potionList.begin(), potionList.end(), smallFind) != potionList.end())
+                {
+                tot = tot + potion(3);
+                cout << "Your health increased by 25 points!" << endl;
+                  
+                }
+              }
+              
+        vector<string> mediumPotion ={"medium", "medium potion", "medium health potion", "medium health"};
+              if (find(mediumPotion.begin(), mediumPotion.end(), itemOption) != mediumPotion.end())
+              {
+                if (find(potionList.begin(), potionList.end(), mediumFind) != potionList.end())
+                {
+                tot = tot + potion(2);
+                cout << "Your health increased by 50 points!" << endl;
+                }
+              }
+        vector<string> largePotion ={"large", "large potion", "large health potion", "large health"};
+              if (find(largePotion.begin(), largePotion.end(), itemOption) != largePotion.end())
+              {
+                if (find(potionList.begin(), potionList.end(), largeFind) != potionList.end())
+                {
+                tot = tot + potion(1);
+                cout << "Your health increased by 100 points!" << endl;
+                }
+              }
+              else
+              {
+                cout << "You do not have any of that potion left." << endl;
+              }
+      }
+        
+      
+        else
+        {
+          cout << "You have no items " << endl;
+        }
+      }
+      vector<string> runList ={"run"};
+      if (find(runList.begin(), runList.end(), combatOption) != runList.end())
+      {
+        hp = tot;
         return make_pair(0, 0);
       }
-      
-      cout << "You defeated the monster and gained " << exp << " experience" << endl;
-        return make_pair(hp, exp); 
-         
-
-  }
+      }
+       }
         catch( sqlite::exception e )      // catch all sql issues
     {
         cerr << e.what() << endl;
         return make_pair(0, 0);
     }
   }
-    else
-    {
+}
+
+//Combat - Suraj
+pair<int, int> combat(int id_monster, int strenght, int magic_points, int armour, int hp, int x, int y, string xy, vector <string> visitedList, vector <string> potionList)
+
+{
+  int damage, shield, exp;
+  int tot = armour + hp;
+  string smallFind = "25";
+  string mediumFind = "50";
+  string largeFind = "100";
+  string sqliteFile = "databaseALL.sqlite3";
+  {
     try 
     {
         sqlite::sqlite db( sqliteFile );
@@ -287,7 +441,7 @@ pair<int, int> combat(int id_monster, int strenght, int magic_points, int armour
         cur4->bind(3, y);
       
         cur4->step();
-      
+       
       while(shield > 0)
       {
       string combatOption = "";
@@ -299,9 +453,15 @@ pair<int, int> combat(int id_monster, int strenght, int magic_points, int armour
       vector<string> fightList ={"fight"};
       if (find(fightList.begin(), fightList.end(), combatOption) != fightList.end())
       {
-        cout << "Your health points have dropped from " << tot << endl;
-                tot = tot - damage/2;
-        cout << "to " << tot << endl;
+        cout << "Your health points have dropped from " << tot;
+                tot = tot - damage;
+        if (tot < 1)
+        {
+          tot = 0;
+        }
+        cout << " to " << tot << endl;
+        
+        cout << "The " << monName << "'s health points have dropped from " << shield;
                 if(strenght > magic_points)
                 {
                     shield -= strenght;
@@ -310,34 +470,96 @@ pair<int, int> combat(int id_monster, int strenght, int magic_points, int armour
                 {
                     shield -= magic_points;
                 }
+        if (shield < 1)
+        {
+          shield = 0;
+        }
+        cout << " to " << shield << endl;
         if(tot <= 0)
         {        
             throw invalid_argument( "YOU DIED :)" );
         }
         if (shield <= 0)
         {
-        cout << "You defeated the monster and gained " << exp << " experience" << endl;
-        return make_pair(hp, exp);
+          int healing = rand() % 25;
+          cout << "You defeated the monster and gained " << exp << " experience points as well as " << healing << " health points!" << endl;
+          hp = tot;
+          hp = hp + healing;
+          return make_pair(hp, exp);
         }
             
       }
       vector<string> itemList ={"item"};
+
       if (find(itemList.begin(), itemList.end(), combatOption) != itemList.end())
       {
+                if (potionList.size() != 0)
+        {
+      cout << "These are the potions you have available: " << endl;
+      if (find(potionList.begin(), potionList.end(), smallFind) != potionList.end())
+      {
+        cout << "Small Health Potion" << endl;
+        
+      }
+              if (find(potionList.begin(), potionList.end(), mediumFind) != potionList.end())
+      {
+        cout << "Medium Health Potion" << endl;
+      }
+              if (find(potionList.begin(), potionList.end(), largeFind) != potionList.end())
+      {
+        cout << "Large Health Potion" << endl;
+      }
+
       string itemOption = "";
-      cout << "These are the potions you have available, what would you like to use?" ;
+      cout << "What potion would you like to use? " ;
       cin >> itemOption;
       transform(itemOption.begin(), itemOption.end(), itemOption.begin(), ::tolower);
-      vector<string> healthPotion ={"health"};
-              if (find(healthPotion.begin(), healthPotion.end(), itemOption) != healthPotion.end())
+      
+      vector<string> smallPotion ={"small", "small potion", "small health potion", "small health"};
+              if (find(smallPotion.begin(), smallPotion.end(), itemOption) != smallPotion.end())
               {
-                tot += 70;
+                if (find(potionList.begin(), potionList.end(), smallFind) != potionList.end())
+                {
+                tot = tot + potion(3);
+                cout << "Your health increased by 25 points!" << endl;
+                  
+                }
               }
-
+              
+        vector<string> mediumPotion ={"medium", "medium potion", "medium health potion", "medium health"};
+              if (find(mediumPotion.begin(), mediumPotion.end(), itemOption) != mediumPotion.end())
+              {
+                if (find(potionList.begin(), potionList.end(), mediumFind) != potionList.end())
+                {
+                tot = tot + potion(2);
+                cout << "Your health increased by 50 points!" << endl;
+                }
+              }
+        vector<string> largePotion ={"large", "large potion", "large health potion", "large health"};
+              if (find(largePotion.begin(), largePotion.end(), itemOption) != largePotion.end())
+              {
+                if (find(potionList.begin(), potionList.end(), largeFind) != potionList.end())
+                {
+                tot = tot + potion(1);
+                cout << "Your health increased by 100 points!" << endl;
+                }
+              }
+              else
+              {
+                cout << "You do not have any of that potion left." << endl;
+              }
+      }
+        
+      
+        else
+        {
+          cout << "You have no items " << endl;
+        }
       }
       vector<string> runList ={"run"};
       if (find(runList.begin(), runList.end(), combatOption) != runList.end())
       {
+        hp = tot;
         return make_pair(0, 0);
       }
       }
@@ -352,29 +574,12 @@ pair<int, int> combat(int id_monster, int strenght, int magic_points, int armour
     }
 }
   }
-// Potions - Michal
-int potion(int potion_number)
+string updateXY(int x,int y)
 {
-    try 
-    {
-        string sqliteFile = "databaseALL.sqlite3";
-        sqlite::sqlite db( sqliteFile );
-        auto cur4 = db.get_statement();
-        cur4->set_sql("SELECT name, value "
-                      "FROM Potions "
-                      "WHERE id_potion = ?");
-        cur4->prepare();
-        cur4->bind(1, potion_number);
-        cur4->step();
-      
-        cout << "You've found a " << cur4->get_text(0) << " which adds " << cur4->get_int(1) << " points to your health" << endl;
-        return(cur4->get_int(1));
-    }
-    catch( sqlite::exception e )      // catch all sql issues
-    {
-        std::cerr << e.what() << std::endl;
-        return 0;
-    }
+  string stringX = to_string(x);
+  string stringY = to_string(y);
+  string xy = stringX + stringY;
+  return xy;
 }
 
 //Saving the game - Abdullah
@@ -423,67 +628,61 @@ int save_the_game(string name, string gender, string character_class, int level,
     }
 }
 //direction functions - Charlie
-int checkingDirectionForwards(int x,int y, int randomnumberX, int randomnumberY,int yrange)
+int checkingDirectionForwards(int x,int y, int yrange)
 {
-    if (y == yrange || (x == randomnumberX && y == randomnumberY))
+    if (y == yrange)
     {
     cout << "You cannot go forwards, try another direction" << endl;
     }
     if (y < yrange)
     {
-        if (x != randomnumberX || y != randomnumberY)
-        {
+
         y=y+1;
-        }
+
         cout << "You have moved forwards" << endl;
     }
     return y;
 }
-int checkingDirectionBackwards(int x,int y, int randomnumberX, int randomnumberY,int yrange)
+int checkingDirectionBackwards(int x,int y, int yrange)
 {
-    if (y == 0 || (x == randomnumberX && y == randomnumberY))
+    if (y == 0)
     {
     cout << "You cannot go backwards, try another direction" << endl;
     }
     if (y > 0)
     {
-        if (x != randomnumberX || y != randomnumberY)
-        {
+
         y=y-1;
-        }
+
         cout << "You have moved backwards" << endl;
     }
     return y;
 }
-int checkingDirectionRight(int x,int y, int randomnumberX, int randomnumberY,int xrange)
+int checkingDirectionRight(int x,int y, int xrange)
 {
-    if (x == xrange || (x == randomnumberX && y == randomnumberY))
+    if (x == xrange)
     {
     cout << "You cannot go right, try another direction" << endl;
     }
     if (x < xrange)
     {
-        if (x != randomnumberX || y != randomnumberY)
-        {
+
         x=x+1;
-        }
+        
         cout << "You have moved right"<< endl;
     }
     return x;
 }
 
-int checkingDirectionLeft(int x,int y, int randomnumberX, int randomnumberY,int xrange)
+int checkingDirectionLeft(int x,int y, int xrange)
 {
-    if (x == 0 || (x == randomnumberX && y == randomnumberY))
+    if (x == 0)
     {
     cout << "You cannot go left, try another direction" <<  endl;
     }
     if (x > 0)
     {
-        if (x != randomnumberX || y != randomnumberY)
-        {
         x=x-1;      
-        }
         cout << "You have moved left" << endl;
     }
     return x;
@@ -491,6 +690,7 @@ int checkingDirectionLeft(int x,int y, int randomnumberX, int randomnumberY,int 
 
 int main()
 {   
+    monsterReset();
     string name, gender, character_class, menu_choice;
     int user_choice, level, strenght, magic_points, armour, hp, hp_max, exp, exp_max;
     int menu_check = 0;
@@ -500,11 +700,9 @@ int main()
 
     int xrange = 10;
     int yrange = 10;    
-    vector <string> visitedList{};
+    vector <string> visitedList{"00"};
+    vector <string> potionList{};
 
-    int randomnumberX = rand() % 10; 
-    int ID = rand() % 9999;
-    int randomnumberY = rand() % 10; 
     string sqliteFile = "databaseALL.sqlite3";
         //Main menu - Suraj
         cout << "Press a number to choose" << endl;
@@ -566,64 +764,58 @@ int main()
                   
                         if (find(forwardList.begin(), forwardList.end(), direction) != forwardList.end())
                         {
-                            y = checkingDirectionForwards(x,y, randomnumberX, randomnumberY, yrange); // call a checking function to see if you can move that way, then run the forwards function.
-                            if (!(find(visitedList.begin(), visitedList.end(), xy) != visitedList.end()))
+                            y = checkingDirectionForwards(x, y, yrange); // call a checking function to see if you can move that way, then run the forwards function.
+                           xy = updateXY(x,y);
+                        if (y != previousY)
+                          {
+                            if (find(visitedList.begin(), visitedList.end(), xy) != visitedList.end())
+                            {
+                               auto result_combatAgain = combatAgain(number_monster, hero.strenght, hero.magic_points, hero.armour, hero.health_points, x, y, xy, visitedList, potionList);
+                               if (result_combatAgain.first == 0 && result_combatAgain.second == 0)
+                                 {
+                                   x = previousX;
+                                   y = previousY;
+                                 }
+                               if (result_combatAgain.first != 0)
+                                 {
+                                   hero.update_hp(result_combatAgain.first);
+                                 }
+                                 hero.add_experience(result_combatAgain.second);
+                                    }
+                           if (!(find(visitedList.begin(), visitedList.end(), xy) != visitedList.end()))
                             {
                                 visitedList.push_back(xy);
                                 int random_thing = rand() % 100;
-                                int number_potion = rand() % 7;
+                                int number_potion = rand() % 2;
+                                if (number_potion == 0)
+                                {
+                                  number_potion = 3;
+                                }
                                 if (random_thing < 90)
                                 {
                                     if (random_thing < 60)
                                     {
-                                        auto result_combat = combat(number_monster, hero.strenght, hero.magic_points, hero.armour, hero.health_points, x, y, xy, visitedList);
+                                        auto result_combat = combat(number_monster, hero.strenght, hero.magic_points, hero.armour, hero.health_points, x, y, xy, visitedList, potionList);
                                         if (result_combat.first == 0 && result_combat.second == 0)
                                         {
-                                          visitedList.pop_back();
+                                          
                                           x = previousX;
                                           y = previousY;
                                         }
+                                        if (result_combat.first != 0)
+                                        {
                                         hero.update_hp(result_combat.first);
+                                        }
                                         hero.add_experience(result_combat.second);
                                     }
                                     else
                                     {
-                                        hero.add_hp(potion(number_potion));
-                                    }
-                                }
-                                else
-                                {
-                                    cout << "You didn't find anything" << endl;
-                                }
-                            }
-                        }
-                    
-                        else if (find(backwardsList.begin(), backwardsList.end(), direction) != backwardsList.end())
-                        {
+                                        //hero.add_hp(potion(number_potion));
+                                        potionFind(number_potion);
+                                        int potionRetrieve = potion(number_potion);
+                                        string potionAdd = to_string(potionRetrieve);
+                                        potionList.push_back(potionAdd);
 
-                            y = checkingDirectionBackwards(x,y, randomnumberX, randomnumberY, yrange); 
-                                    if (!(find(visitedList.begin(), visitedList.end(), xy) != visitedList.end()))
-                            {
-                                visitedList.push_back(xy);
-                                int random_thing = rand() % 100;
-                                int number_potion = rand() % 7;
-                                if (random_thing < 90)
-                                {
-                                    if (random_thing < 60)
-                                    {
-                                        auto result_combat = combat(number_monster, hero.strenght, hero.magic_points, hero.armour, hero.health_points, x, y, xy, visitedList);
-                                        if (result_combat.first == 0 && result_combat.second == 0)
-                                        {
-                                          visitedList.pop_back();
-                                          x = previousX;
-                                          y = previousY;
-                                        }
-                                        hero.update_hp(result_combat.first);
-                                        hero.add_experience(result_combat.second);
-                                    }
-                                    else
-                                    {
-                                        hero.add_hp(potion(number_potion));
                                     }
                                 }
                                 else
@@ -631,34 +823,64 @@ int main()
                                     cout << "You didn't find anything" << endl;
                                 }
                             }
-                        }
+                          }
+                }
+                        
                     
-                        else if (find(rightList.begin(), rightList.end(), direction) != rightList.end())
+                        if (find(backwardsList.begin(), backwardsList.end(), direction) != backwardsList.end())
                         {
-                            x = checkingDirectionRight(x,y, randomnumberX, randomnumberY, xrange); 
-                                    if (!(find(visitedList.begin(), visitedList.end(), xy) != visitedList.end()))
+                            y = checkingDirectionBackwards(x, y, yrange); // call a checking function to see if you can move that way, then run the forwards function.
+                           xy = updateXY(x,y);
+                        if (y != previousY)
+                          {
+                                  if (find(visitedList.begin(), visitedList.end(), xy) != visitedList.end())
+                            {
+                                        auto result_combatAgain = combatAgain(number_monster, hero.strenght, hero.magic_points, hero.armour, hero.health_points, x, y, xy, visitedList, potionList);
+                                        if (result_combatAgain.first == 0 && result_combatAgain.second == 0)
+                                        {
+                                          x = previousX;
+                                          y = previousY;
+                                        }
+                                        if (result_combatAgain.first != 0)
+                                        {
+                                        hero.update_hp(result_combatAgain.first);
+                                        }
+                                        hero.add_experience(result_combatAgain.second);
+                                    }
+                           if (!(find(visitedList.begin(), visitedList.end(), xy) != visitedList.end()))
                             {
                                 visitedList.push_back(xy);
                                 int random_thing = rand() % 100;
-                                int number_potion = rand() % 7;
+                                int number_potion = rand() % 2;
+                                if (number_potion == 0)
+                                {
+                                  number_potion = 3;
+                                }
                                 if (random_thing < 90)
                                 {
                                     if (random_thing < 60)
                                     {
-                                        auto result_combat = combat(number_monster, hero.strenght, hero.magic_points, hero.armour, hero.health_points, x, y, xy, visitedList);
+                                        auto result_combat = combat(number_monster, hero.strenght, hero.magic_points, hero.armour, hero.health_points, x, y, xy, visitedList, potionList);
                                         if (result_combat.first == 0 && result_combat.second == 0)
                                         {
-                                          visitedList.pop_back();
+                                          
                                           x = previousX;
                                           y = previousY;
                                         }
+                                        if (result_combat.first != 0)
+                                        {
                                         hero.update_hp(result_combat.first);
+                                        }
                                         hero.add_experience(result_combat.second);
                                     }
                                     else
                                     {
-                                        hero.add_hp(potion(number_potion));
-                                      // need michals potion db
+                                        //hero.add_hp(potion(number_potion));
+                                        potionFind(number_potion);
+                                        int potionRetrieve = potion(number_potion);
+                                        string potionAdd = to_string(potionRetrieve);
+                                        potionList.push_back(potionAdd);
+
                                     }
                                 }
                                 else
@@ -666,32 +888,62 @@ int main()
                                     cout << "You didn't find anything" << endl;
                                 }
                             }
-                        }
-                       
-                        else if (find(leftList.begin(), leftList.end(), direction) != leftList.end())
+                          }
+                }
+                  if (find(rightList.begin(), rightList.end(), direction) != rightList.end())
                         {
-                            x = checkingDirectionLeft(x,y, randomnumberX, randomnumberY, xrange); 
-                                    if (!(find(visitedList.begin(), visitedList.end(), xy) != visitedList.end()))
+                            x = checkingDirectionRight(x, y, yrange); // call a checking function to see if you can move that way, then run the forwards function.
+                           xy = updateXY(x,y);
+                        if (x != previousX)
+                          {
+                                  if (find(visitedList.begin(), visitedList.end(), xy) != visitedList.end())
                             {
+                                        auto result_combatAgain = combatAgain(number_monster, hero.strenght, hero.magic_points, hero.armour, hero.health_points, x, y, xy, visitedList, potionList);
+                                        if (result_combatAgain.first == 0 && result_combatAgain.second == 0)
+                                        {
+                                          x = previousX;
+                                          y = previousY;
+                                        }
+                                        if (result_combatAgain.first != 0)
+                                        {
+                                        hero.update_hp(result_combatAgain.first);
+                                        }
+                                        hero.add_experience(result_combatAgain.second);
+                                    }
+                           if (!(find(visitedList.begin(), visitedList.end(), xy) != visitedList.end()))
+                            {
+                                visitedList.push_back(xy);
                                 int random_thing = rand() % 100;
-                                int number_potion = rand() % 7;
+                                int number_potion = rand() % 2;
+                                if (number_potion == 0)
+                                {
+                                  number_potion = 3;
+                                }
                                 if (random_thing < 90)
                                 {
                                     if (random_thing < 60)
                                     {
-                                        auto result_combat = combat(number_monster, hero.strenght, hero.magic_points, hero.armour, hero.health_points, x, y, xy, visitedList);
+                                        auto result_combat = combat(number_monster, hero.strenght, hero.magic_points, hero.armour, hero.health_points, x, y, xy, visitedList, potionList);
                                         if (result_combat.first == 0 && result_combat.second == 0)
                                         {
-                                          visitedList.pop_back();
+                                          
                                           x = previousX;
                                           y = previousY;
                                         }
-                                      hero.update_hp(result_combat.first);
+                                        if (result_combat.first != 0)
+                                        {
+                                        hero.update_hp(result_combat.first);
+                                        }
                                         hero.add_experience(result_combat.second);
                                     }
                                     else
                                     {
                                         hero.add_hp(potion(number_potion));
+                                        //potionFind(number_potion);
+                                        //int potionRetrieve = potion(number_potion);
+                                        //string potionAdd = to_string(potionRetrieve);
+                                        //potionList.push_back(potionAdd);
+
                                     }
                                 }
                                 else
@@ -699,7 +951,71 @@ int main()
                                     cout << "You didn't find anything" << endl;
                                 }
                             }
-                        }
+                          }
+                }
+                  if (find(leftList.begin(), leftList.end(), direction) != leftList.end())
+                        {
+                            x = checkingDirectionLeft(x, y, yrange); // call a checking function to see if you can move that way, then run the forwards function.
+                           xy = updateXY(x,y);
+                        if (x != previousX)
+                          {
+                                  if (find(visitedList.begin(), visitedList.end(), xy) != visitedList.end())
+                            {
+                                        auto result_combatAgain = combatAgain(number_monster, hero.strenght, hero.magic_points, hero.armour, hero.health_points, x, y, xy, visitedList, potionList);
+                                        if (result_combatAgain.first == 0 && result_combatAgain.second == 0)
+                                        {
+                                          x = previousX;
+                                          y = previousY;
+                                        }
+                                        if (result_combatAgain.first != 0)
+                                        {
+                                        hero.update_hp(result_combatAgain.first);
+                                        }
+                                        hero.add_experience(result_combatAgain.second);
+                                    }
+                           if (!(find(visitedList.begin(), visitedList.end(), xy) != visitedList.end()))
+                            {
+                                visitedList.push_back(xy);
+                                int random_thing = rand() % 100;
+                                int number_potion = rand() % 2;
+                                if (number_potion == 0)
+                                {
+                                  number_potion = 3;
+                                }
+                                if (random_thing < 90)
+                                {
+                                    if (random_thing < 60)
+                                    {
+                                        auto result_combat = combat(number_monster, hero.strenght, hero.magic_points, hero.armour, hero.health_points, x, y, xy, visitedList, potionList);
+                                        if (result_combat.first == 0 && result_combat.second == 0)
+                                        {
+                                          
+                                          x = previousX;
+                                          y = previousY;
+                                        }
+                                        if (result_combat.first != 0)
+                                        {
+                                        hero.update_hp(result_combat.first);
+                                        }
+                                        hero.add_experience(result_combat.second);
+                                    }
+                                    else
+                                    {
+                                        //hero.add_hp(potion(number_potion));
+                                        potionFind(number_potion);
+                                        int potionRetrieve = potion(number_potion);
+                                        string potionAdd = to_string(potionRetrieve);
+                                        potionList.push_back(potionAdd);
+
+                                    }
+                                }
+                                else
+                                {
+                                    cout << "You didn't find anything" << endl;
+                                }
+                            }
+                          }
+                }
                     
                         else if (direction == "weast")
                         {
