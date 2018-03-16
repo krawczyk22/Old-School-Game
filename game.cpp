@@ -221,6 +221,7 @@ int monsterReset() //Charlie
       cur5->prepare();
       cur5->step();
 }
+//combat when previously encountered - Charlie + Suraj
 pair<int, int> combatAgain(int id_monster, int strenght, int magic_points, int armour, int hp, int x, int y, string xy, vector <string> visitedList, vector <string> potionList)
 /* This function takes in details on the user and their location as well as the monster id
 This function is slightly different to combat as it only runs if a user has entered this room before and not beaten the monster
