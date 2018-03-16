@@ -212,6 +212,7 @@ int potion(int potion_number)
 
 
 int monsterReset() //Charlie
+  //Deletes all data in the SaveMonster table at the start of a playthrough
 {
       string sqliteFile = "databaseALL.sqlite3";
       sqlite::sqlite db( sqliteFile );
@@ -221,6 +222,12 @@ int monsterReset() //Charlie
       cur5->step();
 }
 pair<int, int> combatAgain(int id_monster, int strenght, int magic_points, int armour, int hp, int x, int y, string xy, vector <string> visitedList, vector <string> potionList)
+/* This function takes in details on the user and their location as well as the monster id
+This function is slightly different to combat as it only runs if a user has entered this room before and not beaten the monster
+The monster id is used in the SaveMonster database to access data from the enemy and weapons tables
+This allows the same monster to appear in the same spot until it is beaten
+The combat sequence begins and runs until the player runs or either the player or monster runs out of health
+The player can either fight or run, running returns the player to the previous area */
 {
       int damage, shield, exp;
     int tot = armour + hp;
@@ -312,9 +319,13 @@ pair<int, int> combatAgain(int id_monster, int strenght, int magic_points, int a
   }
 }
 
-//Combat - Suraj
+//Combat - Suraj + Charlie
 pair<int, int> combat(int id_monster, int strenght, int magic_points, int armour, int hp, int x, int y, string xy, vector <string> visitedList, vector <string> potionList)
-
+/* This function takes in details on the user and their location as well as the monster id
+The monster id is used to get the relevant details on the monster such as health points
+The monster and their location is written into the SaveMonster databaseALL
+The combat sequence begins and runs until the player runs or either the player or monster runs out of health
+The player can either fight or run, running returns the player to the previous area */
 {
   int damage, shield, exp;
   int tot = armour + hp;
@@ -414,7 +425,8 @@ pair<int, int> combat(int id_monster, int strenght, int magic_points, int armour
     }
 }
   }
-string updateXY(int x,int y)
+// Updating xy data - Charlie
+string updateXY(int x,int y) //takes in the x/y coordinates and returns them together as a string
 {
   string stringX = to_string(x);
   string stringY = to_string(y);
@@ -469,6 +481,8 @@ int save_the_game(string name, string gender, string character_class, int level,
 }
 //direction functions - Charlie
 int checkingDirectionForwards(int x,int y, int yrange)
+// a function which takes in part of the size of the maze and the x/y coordinates 
+// and outputs the new location of the player if they moved
 {
     if (y == yrange)
     {
@@ -578,6 +592,13 @@ int main()
                 cout << "Type 'save' to save the game " << endl;
                 
                 // Executing instructions and the actual maze - Charlie
+                 
+                /* This while loop contains the main map where if you reach the coordinates 10, 10 then the game ends
+                   The user is asked choose a direction (or enter another keyword)
+                   if the user chooses a direction, the player will move 1 space in that x or y coordinate
+                   There is a chance that a potion, a monster or nothing will spawn
+                   As this occurs multiple vectors keep track of where the player has moved and whether they have beaten a monster
+                 */
                 while (!(x == 10 && y == 10))
                 {
                   
