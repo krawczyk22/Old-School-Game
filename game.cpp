@@ -938,7 +938,323 @@ int main()
                     x = cur2->get_int(12);
                     y = cur2->get_int(13);
                     
-                    // not finished. will be similar to the case 1
+                 while (!(x == 10 && y == 10))
+                {
+                  
+                        string direction = "";
+                        cout << "Which direction would you like to go?: " ;
+                        cin >> direction;
+                        transform(direction.begin(), direction.end(), direction.begin(), ::tolower);
+                        string stringX = to_string(x);
+                        string stringY = to_string(y);
+                        string xy = stringX + stringY;
+                        int previousX = x;
+                        int previousY = y;
+                      int number_monster = rand() % 15;
+                      if (number_monster == 0)
+                      {
+                        number_monster = 1;
+                      }
+
+                        vector<string> forwardList ={"forwards","forward","north","ahead","onwards"};
+                        vector<string> backwardsList ={"backwards","backward","south","down","downward","downwards","back"};
+                        vector<string> rightList ={"right","east"};
+                        vector<string> leftList ={"left","west"};
+                        
+                        if (find(forwardList.begin(), forwardList.end(), direction) != forwardList.end())
+                        {
+                            y = checkingDirectionForwards(x, y, yrange); // call a checking function to see if you can move that way, then run the forwards function.
+                           xy = updateXY(x,y);
+                          if (!(find(CompletedList.begin(), CompletedList.end(), xy) != CompletedList.end()))
+                          {
+                          if (y != previousY)
+                          {
+                            if (find(visitedList.begin(), visitedList.end(), xy) != visitedList.end())
+                            {
+                               auto result_combatAgain = combatAgain(number_monster, hero.strenght, hero.magic_points, hero.armour, hero.health_points, x, y, xy, visitedList, potionList);
+                               if (result_combatAgain.first == 0 && result_combatAgain.second == 0)
+                                 {
+                                   x = previousX;
+                                   y = previousY;
+                                 }
+                               if (result_combatAgain.first != 0)
+                                 {
+                                   hero.update_hp(result_combatAgain.first);
+                                   CompletedList.push_back(xy);
+                                 }
+                                 hero.add_experience(result_combatAgain.second);
+                                    }
+                           if (!(find(visitedList.begin(), visitedList.end(), xy) != visitedList.end()))
+                            {
+                                visitedList.push_back(xy);
+                                int random_thing = rand() % 100;
+                                int number_potion = rand() % 2;
+                                if (number_potion == 0)
+                                {
+                                  number_potion = 3;
+                                }
+                                if (random_thing < 90)
+                                {
+                                    if (random_thing < 60)
+                                    {
+                                        auto result_combat = combat(number_monster, hero.strenght, hero.magic_points, hero.armour, hero.health_points, x, y, xy, visitedList, potionList);
+                                        if (result_combat.first == 0 && result_combat.second == 0)
+                                        {
+                                          
+                                          x = previousX;
+                                          y = previousY;
+                                        }
+                                        if (result_combat.first != 0)
+                                        {
+                                        hero.update_hp(result_combat.first);
+                                          CompletedList.push_back(xy);
+                                        }
+                                        hero.add_experience(result_combat.second);
+                                    }
+                                    else
+                                    {
+                                      hero.add_hp(potion(number_potion));
+                                      CompletedList.push_back(xy);
+
+                                    }
+                                }
+                                else
+                                {
+                                    cout << "You didn't find anything" << endl;
+                                  CompletedList.push_back(xy);
+                                }
+                            }
+                          }
+                          }
+                }
+                        
+                    
+                       else if (find(backwardsList.begin(), backwardsList.end(), direction) != backwardsList.end())
+                        {
+                            y = checkingDirectionBackwards(x, y, yrange); // call a checking function to see if you can move that way, then run the forwards function.
+                           xy = updateXY(x,y);
+                          if (!(find(CompletedList.begin(), CompletedList.end(), xy) != CompletedList.end()))
+                          {
+                           if (y != previousY)
+                          {
+                                  if (find(visitedList.begin(), visitedList.end(), xy) != visitedList.end())
+                            {
+                                        auto result_combatAgain = combatAgain(number_monster, hero.strenght, hero.magic_points, hero.armour, hero.health_points, x, y, xy, visitedList, potionList);
+                                        if (result_combatAgain.first == 0 && result_combatAgain.second == 0)
+                                        {
+                                          x = previousX;
+                                          y = previousY;
+                                        }
+                                        if (result_combatAgain.first != 0)
+                                        {
+                                        hero.update_hp(result_combatAgain.first);
+                                          CompletedList.push_back(xy);
+                                        }
+                                        hero.add_experience(result_combatAgain.second);
+                                    }
+                           if (!(find(visitedList.begin(), visitedList.end(), xy) != visitedList.end()))
+                            {
+                                visitedList.push_back(xy);
+                                int random_thing = rand() % 100;
+                                int number_potion = rand() % 2;
+                                if (number_potion == 0)
+                                {
+                                  number_potion = 3;
+                                }
+                                if (random_thing < 90)
+                                {
+                                    if (random_thing < 60)
+                                    {
+                                        auto result_combat = combat(number_monster, hero.strenght, hero.magic_points, hero.armour, hero.health_points, x, y, xy, visitedList, potionList);
+                                        if (result_combat.first == 0 && result_combat.second == 0)
+                                        {
+                                          
+                                          x = previousX;
+                                          y = previousY;
+                                        }
+                                        if (result_combat.first != 0)
+                                        {
+                                        hero.update_hp(result_combat.first);
+                                          CompletedList.push_back(xy);
+                                        }
+                                        hero.add_experience(result_combat.second);
+                                    }
+                                    else
+                                    {
+                                        //hero.add_hp(potion(number_potion));
+                                      CompletedList.push_back(xy);
+
+                                    }
+                                }
+                                else
+                                {
+                                    cout << "You didn't find anything" << endl;
+                                  CompletedList.push_back(xy);
+                                }
+                            }
+                          }
+                          }
+                }
+                 else if (find(rightList.begin(), rightList.end(), direction) != rightList.end())
+                        {
+                            x = checkingDirectionRight(x, y, yrange); // call a checking function to see if you can move that way, then run the forwards function.
+                           xy = updateXY(x,y);
+                        if (!(find(CompletedList.begin(), CompletedList.end(), xy) != CompletedList.end()))
+                          {
+                            if (x != previousX)
+                          {
+                                  if (find(visitedList.begin(), visitedList.end(), xy) != visitedList.end())
+                            {
+                                        auto result_combatAgain = combatAgain(number_monster, hero.strenght, hero.magic_points, hero.armour, hero.health_points, x, y, xy, visitedList, potionList);
+                                        if (result_combatAgain.first == 0 && result_combatAgain.second == 0)
+                                        {
+                                          x = previousX;
+                                          y = previousY;
+                                        }
+                                        if (result_combatAgain.first != 0)
+                                        {
+                                        hero.update_hp(result_combatAgain.first);
+                                          CompletedList.push_back(xy);
+                                        }
+                                        hero.add_experience(result_combatAgain.second);
+                                    }
+                           if (!(find(visitedList.begin(), visitedList.end(), xy) != visitedList.end()))
+                            {
+                                visitedList.push_back(xy);
+                                int random_thing = rand() % 100;
+                                int number_potion = rand() % 2;
+                                if (number_potion == 0)
+                                {
+                                  number_potion = 3;
+                                }
+                                if (random_thing < 90)
+                                {
+                                    if (random_thing < 60)
+                                    {
+                                        auto result_combat = combat(number_monster, hero.strenght, hero.magic_points, hero.armour, hero.health_points, x, y, xy, visitedList, potionList);
+                                        if (result_combat.first == 0 && result_combat.second == 0)
+                                        {
+                                          
+                                          x = previousX;
+                                          y = previousY;
+                                        }
+                                        if (result_combat.first != 0)
+                                        {
+                                        hero.update_hp(result_combat.first);
+                                          CompletedList.push_back(xy);
+                                        }
+                                        hero.add_experience(result_combat.second);
+                                    }
+                                    else
+                                    {
+                                        hero.add_hp(potion(number_potion));
+                                        CompletedList.push_back(xy);
+
+                                    }
+                                }
+                                else
+                                {
+                                    cout << "You didn't find anything" << endl;
+                                  CompletedList.push_back(xy);
+                                }
+                            }
+                          }
+                        }
+                }
+                 else if (find(leftList.begin(), leftList.end(), direction) != leftList.end())
+                        {
+                            x = checkingDirectionLeft(x, y, yrange); // call a checking function to see if you can move that way, then run the forwards function.
+                           xy = updateXY(x,y);
+                          if (!(find(CompletedList.begin(), CompletedList.end(), xy) != CompletedList.end()))
+                          {
+                            if (x != previousX)
+                          {
+                                  if (find(visitedList.begin(), visitedList.end(), xy) != visitedList.end())
+                            {
+                                        auto result_combatAgain = combatAgain(number_monster, hero.strenght, hero.magic_points, hero.armour, hero.health_points, x, y, xy, visitedList, potionList);
+                                        if (result_combatAgain.first == 0 && result_combatAgain.second == 0)
+                                        {
+                                          x = previousX;
+                                          y = previousY;
+                                        }
+                                        if (result_combatAgain.first != 0)
+                                        {
+                                        hero.update_hp(result_combatAgain.first);
+                                          CompletedList.push_back(xy);
+                                        }
+                                        hero.add_experience(result_combatAgain.second);
+                                    }
+                           if (!(find(visitedList.begin(), visitedList.end(), xy) != visitedList.end()))
+                            {
+                                visitedList.push_back(xy);
+                                int random_thing = rand() % 100;
+                                int number_potion = rand() % 2;
+                                if (number_potion == 0)
+                                {
+                                  number_potion = 3;
+                                }
+                                if (random_thing < 90)
+                                {
+                                    if (random_thing < 60)
+                                    {
+                                        auto result_combat = combat(number_monster, hero.strenght, hero.magic_points, hero.armour, hero.health_points, x, y, xy, visitedList, potionList);
+                                        if (result_combat.first == 0 && result_combat.second == 0)
+                                        {
+                                          
+                                          x = previousX;
+                                          y = previousY;
+                                        }
+                                        if (result_combat.first != 0)
+                                        {
+                                        hero.update_hp(result_combat.first);
+                                          CompletedList.push_back(xy);
+                                        }
+                                        hero.add_experience(result_combat.second);
+                                    }
+                                    else
+                                    {
+                                        hero.add_hp(potion(number_potion));
+                                      CompletedList.push_back(xy);
+
+                                    }
+                                }
+                                else
+                                {
+                                    cout << "You didn't find anything" << endl;
+                                  CompletedList.push_back(xy);
+                                }
+                            }
+                          }
+                          }
+                }
+                    
+                        else if (direction == "weast")
+                        {
+                            cout << "Weast? What kind of compass are you reading?" << endl;
+                        }
+                    
+                        else if (direction == "save")
+                        {
+                            save_the_game(name, gender, character_class, hero.level, hero.health_points, hero.health_points_max, hero.strenght, hero.armour, hero.magic_points, hero.experience, hero.level_up_experience, x, y);
+                        }
+                        
+                        else if (direction == "stats")
+                        {
+                            hero.print_stats();
+                        }
+                        
+                        else if (direction == "quit")
+                        {
+                            return 0;
+                        }
+                  
+                        else 
+                        {
+                            cout << "Wrong value" << endl;
+                        }
+                }
+                
+                cout << "Congratulations! You finished the game" << endl;
                 }
                 catch( sqlite::exception e )      // catch all sql issues
                 {
